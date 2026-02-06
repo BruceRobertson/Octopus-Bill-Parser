@@ -52,6 +52,37 @@ This will:
 - Generate `all_energy_data.csv` with all extracted data
 - Generate `filtered_energy_data.csv` with **Intelligent Octopus bonus slots** - periods charged at off-peak rate (6.67p) outside the standard off-peak window (23:30-05:30)
 
+#### Command Line Options
+
+**Add IOG Cheap Rate Column:**
+To add a boolean column indicating Intelligent Octopus Go cheap rate periods (23:30-05:00 inclusive), use the `-iog` flag:
+
+```bash
+python bill-parser.py -iog
+```
+
+This adds an `IOG Cheap Rate` column to both output CSV files, marking `True` for periods starting from 23:30 up to and including 05:00.
+
+**Custom Filter Rate:**
+By default, the filtered output shows periods with a rate of 6.67p outside off-peak hours. To use a different rate:
+
+```bash
+python bill-parser.py --filter-rate 7.5
+```
+
+**Quiet Mode:**
+To suppress the DataFrame preview output:
+
+```bash
+python bill-parser.py --quiet
+```
+
+Options can be combined:
+
+```bash
+python bill-parser.py -iog --filter-rate 7.5 --quiet
+```
+
 #### Output Columns
 
 | Column | Description |
@@ -63,6 +94,7 @@ This will:
 | Rate | Unit rate in pence per kWh |
 | Consumption | Energy consumed in kWh |
 | Cost | Cost in pence |
+| IOG Cheap Rate | Boolean indicating if period is in IOG cheap rate window (23:30-05:00 inclusive). Only present when `-iog` flag is used. |
 
 ### 2. Filter by Date Range
 
@@ -127,3 +159,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## Disclaimer
 
 This tool is not affiliated with Octopus Energy. It's an independent project to help users analyze their own energy consumption data.
+
+---
+
+*Enhanced and optimized using [Claude Code](https://claude.com/claude-code)*
