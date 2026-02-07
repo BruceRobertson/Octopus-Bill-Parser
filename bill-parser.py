@@ -45,8 +45,6 @@ parser.add_argument('--quiet', '-q', action='store_true', default=False,
 args = parser.parse_args()
 
 # Time constants for performance (parsed once instead of on every function call)
-IOG_START_TIME = datetime.strptime("23:30", "%H:%M").time()
-IOG_END_TIME = datetime.strptime("05:00", "%H:%M").time()
 OFFPEAK_START_TIME = datetime.strptime("23:30", "%H:%M").time()
 OFFPEAK_END_TIME = datetime.strptime("05:30", "%H:%M").time()
 
@@ -80,14 +78,6 @@ def create_timestamps(row):
     except Exception as e:
         print(f"Error creating timestamps for row: {row['Period']} on {row['Date']}: {e}")
         return pd.Series([None, None])
-
-def is_iog_cheap_rate(start_timestamp):
-    """Check if the start time is within the IOG cheap rate window (23:30 to 05:00 inclusive)"""
-    start_dt = datetime.fromisoformat(start_timestamp)
-    start_time = start_dt.time()
-    # Because the IOG window spans midnight,
-    # we consider times from 23:30 to midnight OR from midnight to 05:00 (inclusive) as cheap rate.
-    return (start_time >= IOG_START_TIME) or (start_time <= IOG_END_TIME)
 
 def is_offpeak(period_str):
     """Determine if the period starts during the off-peak window (23:30 - 05:30)"""
@@ -190,7 +180,7 @@ df[['Start', 'End']] = df.apply(create_timestamps, axis=1)
 
 # Add IOG Cheap Rate column if flag is enabled
 if args.iog:
-    df['IOG Cheap Rate'] = df['Start'].apply(is_iog_cheap_rate)
+    df['IOG Cheap Rate'] = df['Period'].apply(is_offpeak)
     df = df[['Start', 'End', 'Date', 'Period', 'Rate', 'Consumption', 'Cost', 'IOG Cheap Rate']]
 else:
     df = df[['Start', 'End', 'Date', 'Period', 'Rate', 'Consumption', 'Cost']]
